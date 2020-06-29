@@ -21,7 +21,6 @@ def getOrgCount():
         # This means something went wrong.
         pp.pprint(f"something went wrong: {resp}")
         return ""
-    # pp.pprint(f"Response: {resp.json()}")
     todo_item = resp.json()['data']
     return len(todo_item)    
     
@@ -36,13 +35,22 @@ def getOrganisations():
     return [ item['id'] for item in todo_item ]
 
 def getOrgObj():
+    result = []
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
         pp.pprint(f"something went wrong: {resp}")
         return ""
     todo_item = resp.json()['data']
-    return [ item['id'] for item in todo_item ]    
+    for item in todo_item:
+         info = { 
+         'name': item['id'],
+         'total_runs': getRunsTotalCount(item['id']),
+         'workspace_count': getWorkspaceCount(item['id']),
+         'workspaces': getWorkspaceInfo(item['id'])
+         }
+         result.append(info)
+    return result    
 
 def getWorkspaceInfo(organisation):
     resp = requests.get(TFE_ADDR+f'/api/v2/organizations/{organisation}/workspaces', headers=headers )
@@ -51,10 +59,7 @@ def getWorkspaceInfo(organisation):
         pp.pprint(f"something went wrong: {resp}")
         return ""
     todo_item = resp.json()['data']
-    # pp.pprint(f"Response: {todo_item}")
-    for item in todo_item:
-         pp.pprint(f"Found Org: {item['attributes']['name']}")
-    # return [ item['id'] for item in todo_item ]
+    return [ item['id'] for item in todo_item ]
 
 def getWorkspaceCount(organisation):
     resp = requests.get(TFE_ADDR+f'/api/v2/organizations/{organisation}/workspaces', headers=headers )
@@ -64,10 +69,8 @@ def getWorkspaceCount(organisation):
         return ""
     todo_item = resp.json()['data']
     return len(todo_item)
-    #pp.pprint(f"Workspace count for {organisation}: {len(todo_item)}")
 
-def getRuns(workspace_id):
-    # http://app.terraform.io/api/v2/workspaces/ws-6LvLRx7uFoDD7Znf/runs
+def getRunsCount(workspace_id):
     resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
@@ -75,27 +78,27 @@ def getRuns(workspace_id):
         return ""
     todo_item = resp.json()['data']
     pp.pprint(f"Run count for {workspace_id}: {len(todo_item)}")
+    return len(todo_item)
+
+def getRunsTotalCount(organisation):
+    total_runs = 0
+    todo_item = getWorkspaceInfo(organisation)
+    for item in todo_item:
+        total_runs +=  getRunsCount(item)
+    pp.pprint(f"Total runs for {organisation}: {total_runs}")    
+    return total_runs     
 
 #Main just has the calls to the above methods, comment out as needed
 def main():
+    result = getOrgObj()
     totalWorkspaces = 0
-    orgs = getOrganisations()
-    # info = {[{
-    #    name: EMEA_SE_PLAYGROUND 
-    #    runs: 0,
-    #    count: 0,
-    #    workspaces: []
-    #    },]
-    # }
-        for org in orgs:
-       totalWorkspaces += getWorkspaceCount(org)
-       pp.pprint(f"Workspace count for {org}: {getWorkspaceCount(org)}")
-   
-    totalOrgs = getOrgCount()
-    pp.pprint(f"Total Organisation count: {totalOrgs} ")
-    pp.pprint(f"Total Workspace count: {totalWorkspaces} ")
-
-
+    totalRuns = 0
+    for org in result:
+        pp.pprint(f"{org['name']} total workspaces: {org['workspace_count']} total runs: {org['total_runs']}")
+        totalWorkspaces += org['workspace_count']
+        totalRuns += org['total_runs']
+    pp.pprint(f"Total workspaces count: {totalWorkspaces}")
+    pp.pprint(f"Total runs count: {totalRuns}")
 
 if __name__ == '__main__':
     main()
