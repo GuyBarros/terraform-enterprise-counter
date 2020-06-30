@@ -25,7 +25,7 @@ def getOrgCount():
     return len(todo_item)    
     
 
-def getOrganisations():
+def getOrganizations():
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
