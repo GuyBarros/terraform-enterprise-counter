@@ -17,17 +17,17 @@ this project will use the api token to list all the Organizations it has access 
 an example output of the project:
 
 ```bash
-andygriffindemo total workspaces: 2 total runs: 24'
+'andygdemo total workspaces: 2 total runs: 24'
 'emea-se-playground-2019 total workspaces: 20 total runs: 241'
 'example-organization total workspaces: 12 total runs: 158'
-'GuyBarros total workspaces: 5 total runs: 0'
+'GuyB total workspaces: 5 total runs: 0'
 'Hashicorp-neh-Demo total workspaces: 20 total runs: 134'
 'hc-emea-sentinel-demo total workspaces: 8 total runs: 47'
-'rgustafsson total workspaces: 6 total runs: 58'
-'RogerBerlind total workspaces: 20 total runs: 242'
+'gustafsson total workspaces: 6 total runs: 58'
+'RogerB total workspaces: 20 total runs: 242'
 'rusty-pro total workspaces: 15 total runs: 148'
 'SNOW-se-demos total workspaces: 20 total runs: 58'
-'TaimurKhanOrg total workspaces: 2 total runs: 14'
+'TaimurOrg total workspaces: 2 total runs: 14'
 'Total workspaces count: 167'
 'Total runs count: 1500'
 ```
