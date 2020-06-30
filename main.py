@@ -4,6 +4,7 @@ import json
 import requests
 import os
 import pprint
+import pandas
 pp = pprint.PrettyPrinter()
 
 TFE_ADDR =  os.environ.get('TFE_ADDR', 'https://app.terraform.io')
@@ -94,9 +95,11 @@ def main():
     totalWorkspaces = 0
     totalRuns = 0
     for org in result:
-        pp.pprint(f"{org['name']} total workspaces: {org['workspace_count']} total runs: {org['total_runs']}")
+    #    pp.pprint(f"{org['name']} total workspaces: {org['workspace_count']} total runs: {org['total_runs']}")
         totalWorkspaces += org['workspace_count']
         totalRuns += org['total_runs']
+    data = pandas.DataFrame(result)
+    pp.pprint(data)
     pp.pprint(f"Total workspaces count: {totalWorkspaces}")
     pp.pprint(f"Total runs count: {totalRuns}")
 
