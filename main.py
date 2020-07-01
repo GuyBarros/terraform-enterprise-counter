@@ -99,7 +99,7 @@ def main():
         totalWorkspaces += org['workspace_count']
         totalRuns += org['total_runs']
     data = pandas.DataFrame(result)
-    pp.pprint(data)
+    pp.pprint(data[['name','workspace_count','total_runs']])
     pp.pprint(f"Total workspaces count: {totalWorkspaces}")
     pp.pprint(f"Total runs count: {totalRuns}")
 
