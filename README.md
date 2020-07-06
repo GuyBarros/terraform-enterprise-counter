@@ -4,9 +4,20 @@ A simple project to count Organizations, Workspaces and Runs.
 ## set up
 This project requires two environment variables to run: TFE_ADDR and TFE_TOKEN.
 
+### on Mac/Linux:
 ```bash
 export TFE_ADDR=https://app.terraform.io
 export TFE_API_TOKEN=hunter2
+```
+
+### on Windows:
+
+![Image](./assets/win_env_vars.png)
+
+
+### Docker:
+```bash
+docker build .
 ```
 
 ## how it works
