@@ -10,7 +10,7 @@ pp = pprint.PrettyPrinter()
 TFE_ADDR =  os.environ.get('TFE_ADDR', 'https://app.terraform.io')
 TFE_API_TOKEN =  os.environ.get('TFE_API_TOKEN', '')
 TFE_SITE_ADMIN =  os.environ.get('TFE_SITE_ADMIN', 'false')
-TFE_PAGE_COUNT =  os.environ.get('TFE_PAGE_COUNT', 9999)
+TFE_PAGE_COUNT =  os.environ.get('TFE_PAGE_COUNT', 100)
 headers = {
     'Content-Type': 'application/vnd.api+json',
     'Authorization': f"Bearer {TFE_API_TOKEN}"  
