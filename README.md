@@ -8,6 +8,7 @@ This project requires two environment variables to run: TFE_ADDR and TFE_TOKEN.
 ```bash
 export TFE_ADDR=https://app.terraform.io
 export TFE_API_TOKEN=hunter2
+export TFE_SITE_ADMIN=false
 ```
 
 ### on Windows:
