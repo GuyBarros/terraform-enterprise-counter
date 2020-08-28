@@ -5,6 +5,8 @@ import requests
 import os
 import pprint
 import pandas
+import time
+from yaspin import yaspin
 pp = pprint.PrettyPrinter()
 
 TFE_ADDR =  os.environ.get('TFE_ADDR', 'https://app.terraform.io')
@@ -35,6 +37,7 @@ def getOrganizations():
     todo_item = resp.json()['data']
     return [ item['id'] for item in todo_item ]
 
+@yaspin(text="Loading...")
 def getOrgObj():
     result = []
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
@@ -68,7 +71,6 @@ def getWorkspaceInfo(organisation):
         todo_item = resp.json()['data']
         metdata =   resp.json()['meta']['pagination']
         current_page = metdata["current-page"]
-        pp.pprint(f"We are in page {current_page} out of {total_pages}")
         for item in todo_item:
             retorno.append(item['id'])
         page += 1
@@ -90,7 +92,6 @@ def getWorkspaceCount(organisation):
         todo_item = resp.json()['data']
         metdata =   resp.json()['meta']['pagination']
         current_page = metdata["current-page"]
-        pp.pprint(f"We are in page {current_page} out of {total_pages} for organization {organisation}")
         for item in todo_item:
             retorno.append(item['id'])
         page += 1
@@ -113,7 +114,6 @@ def getRunsCount(workspace_id):
         todo_item = resp.json()['data']
         metdata =   resp.json()['meta']['pagination']
         current_page = metdata["current-page"]
-        pp.pprint(f"We are in page {current_page} out of {total_pages} for workspace {workspace_id}")
         for item in todo_item:
             retorno.append(item['id'])
         page += 1
@@ -128,7 +128,8 @@ def getRunsTotalCount(organisation):
         total_runs +=  getRunsCount(item)
     pp.pprint(f"Total runs for {organisation}: {total_runs}")    
     return total_runs     
-
+    
+@yaspin(text="Loading...")
 def getWorkspacesFromAdmin():
     resp = requests.get(TFE_ADDR+f'/api/v2/admin/workspaces', headers=headers )
     if resp.status_code != 200:
@@ -165,16 +166,13 @@ def getWorkspacesFromAdmin():
 #Main just has the calls to the above methods, comment out as needed
 def main():
     if (TFE_SITE_ADMIN == 'true'):
-        #result = getWorkspacesFromAdmin()
-        #data = pandas.DataFrame(result)
-        #pp.pprint(data)
-        pp.pprint(TFE_SITE_ADMIN)
+        data = pandas.DataFrame(getWorkspacesFromAdmin())
+        pp.pprint(data)
     else :
         result = getOrgObj()
         totalWorkspaces = 0
         totalRuns = 0
         for org in result:
-        #    pp.pprint(f"{org['name']} total workspaces: {org['workspace_count']} total runs: {org['total_runs']}")
             totalWorkspaces += org['workspace_count']
             totalRuns += org['total_runs']
         data = pandas.DataFrame(result)
