@@ -22,7 +22,7 @@ def getOrgCount():
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while counting Organizations: {resp}")
         return ""
     todo_item = resp.json()['data']
     return len(todo_item)    
@@ -32,7 +32,7 @@ def getOrganizations():
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while getting Organizations: {resp}")
         return ""
     todo_item = resp.json()['data']
     return [ item['id'] for item in todo_item ]
@@ -43,13 +43,14 @@ def getOrgObj():
     resp = requests.get(TFE_ADDR+'/api/v2/organizations', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while creating Org Object: {resp}")
         return ""
     todo_item = resp.json()['data']
     for item in todo_item:
          info = { 
          'name': item['id'],
          'total_runs': getRunsTotalCount(item['id']),
+         'total_applies': getAppliesTotalCount(item['id']),
          'workspace_count': getWorkspaceCount(item['id']),
          'workspaces': getWorkspaceInfo(item['id'])
          }
@@ -62,7 +63,7 @@ def getWorkspaceInfo(organisation):
     resp = requests.get(TFE_ADDR+f'/api/v2/organizations/{organisation}/workspaces?page[size]=100&page[number]={page}', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while getting workspace info: {resp}")
         return ""
     metdata =   resp.json()['meta']['pagination']
     current_page = metdata["current-page"]
@@ -83,7 +84,7 @@ def getWorkspaceCount(organisation):
     resp = requests.get(TFE_ADDR+f'/api/v2/organizations/{organisation}/workspaces?page[size]=100&page[number]={page}', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while counting workspaces: {resp}")
         return ""
     metdata =   resp.json()['meta']['pagination']
     current_page = metdata["current-page"]
@@ -104,7 +105,7 @@ def getRunsCount(workspace_id):
     resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
     if resp.status_code != 200:
         # This means something went wrong.
-        pp.pprint(f"something went wrong: {resp}")
+        pp.pprint(f"something went wrong while counting runs: {resp}")
         return ""
     todo_item = resp.json()['data']
     metdata =   resp.json()['meta']['pagination']
@@ -119,7 +120,31 @@ def getRunsCount(workspace_id):
         page += 1
         resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
     return len(retorno)
-    
+
+def getAppliesCount(workspace_id):
+    page = 1
+    retorno = []
+    resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
+    if resp.status_code != 200:
+        # This means something went wrong.
+        pp.pprint(f"something went wrong while counting applies: {resp}")
+        return ""
+    todo_item = resp.json()['data']
+    metdata =   resp.json()['meta']['pagination']
+    current_page = metdata["current-page"]
+    total_pages = metdata["total-pages"]
+    while page <= total_pages:
+        todo_item = resp.json()['data']
+        metdata =   resp.json()['meta']['pagination']
+        current_page = metdata["current-page"]
+        for item in todo_item:
+            if item['attributes']['status'] == "applied":
+                retorno.append(item['id'])
+            
+        page += 1
+        resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
+    return len(retorno)
+
 
 def getRunsTotalCount(organisation):
     total_runs = 0
@@ -128,7 +153,15 @@ def getRunsTotalCount(organisation):
         total_runs +=  getRunsCount(item)
     pp.pprint(f"Total runs for {organisation}: {total_runs}")    
     return total_runs     
-    
+
+def getAppliesTotalCount(organisation):
+    total_applies = 0
+    todo_item = getWorkspaceInfo(organisation)
+    for item in todo_item:
+        total_applies +=  getAppliesCount(item)
+    pp.pprint(f"Total applies for {organisation}: {total_applies}")    
+    return total_applies     
+
 @yaspin(text="Loading...")
 def getWorkspacesFromAdmin():
     resp = requests.get(TFE_ADDR+f'/api/v2/admin/workspaces', headers=headers )
@@ -172,12 +205,15 @@ def main():
         result = getOrgObj()
         totalWorkspaces = 0
         totalRuns = 0
+        totalApplies = 0
         for org in result:
             totalWorkspaces += org['workspace_count']
             totalRuns += org['total_runs']
+            totalApplies += org['total_applies']
         data = pandas.DataFrame(result)
-        pp.pprint(data[['name','workspace_count','total_runs']])
+        pp.pprint(data[['name','workspace_count','total_runs','total_applies']])
         pp.pprint(f"Total workspaces count: {totalWorkspaces}")
-        pp.pprint(f"Total runs count: {totalRuns}")        
+        pp.pprint(f"Total runs count: {totalRuns}")  
+        pp.pprint(f"Total applies count: {totalApplies}")        
 if __name__ == '__main__':
     main()
