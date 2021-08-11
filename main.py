@@ -6,6 +6,8 @@ import os
 import pprint
 import pandas
 import time
+from datetime import datetime
+from datetime import date
 from yaspin import yaspin
 pp = pprint.PrettyPrinter()
 
@@ -13,6 +15,12 @@ TFE_ADDR =  os.environ.get('TFE_ADDR', 'https://app.terraform.io')
 TFE_API_TOKEN =  os.environ.get('TFE_API_TOKEN', '')
 TFE_SITE_ADMIN =  os.environ.get('TFE_SITE_ADMIN', 'false')
 TFE_PAGE_COUNT =  os.environ.get('TFE_PAGE_COUNT', 100)
+TFE_FILTER_START_DATE = os.environ.get('TFE_FILTER_START_DATE', '31.12.2020')
+TFE_FILTER_END_DATE = os.environ.get('TFE_FILTER_END_DATE', date.today().strftime('%d.%m.%Y'))
+
+date_start = datetime.strptime(TFE_FILTER_START_DATE, '%d.%m.%Y')
+date_end = datetime.strptime(TFE_FILTER_END_DATE, '%d.%m.%Y')
+
 headers = {
     'Content-Type': 'application/vnd.api+json',
     'Authorization': f"Bearer {TFE_API_TOKEN}"  
@@ -116,7 +124,8 @@ def getRunsCount(workspace_id):
         metdata =   resp.json()['meta']['pagination']
         current_page = metdata["current-page"]
         for item in todo_item:
-            retorno.append(item['id'])
+            creation_date = datetime.strptime(item['attributes']['created-at'][:10], "%Y-%m-%d")
+            if date_start < creation_date and creation_date <= date_end : retorno.append(item['id'])
         page += 1
         resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
     return len(retorno)
@@ -138,9 +147,9 @@ def getAppliesCount(workspace_id):
         metdata =   resp.json()['meta']['pagination']
         current_page = metdata["current-page"]
         for item in todo_item:
+            creation_date = datetime.strptime(item['attributes']['created-at'][:10], "%Y-%m-%d")
             if item['attributes']['status'] == "applied":
-                retorno.append(item['id'])
-            
+                if date_start < creation_date and creation_date <= date_end: retorno.append(item['id'])
         page += 1
         resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
     return len(retorno)
@@ -214,6 +223,7 @@ def main():
         pp.pprint(data[['name','workspace_count','total_runs','total_applies']])
         pp.pprint(f"Total workspaces count: {totalWorkspaces}")
         pp.pprint(f"Total runs count: {totalRuns}")  
-        pp.pprint(f"Total applies count: {totalApplies}")        
+        pp.pprint(f"Total applies count: {totalApplies}")  
+        pp.pprint(f"from {date_start} to {date_end}")      
 if __name__ == '__main__':
     main()

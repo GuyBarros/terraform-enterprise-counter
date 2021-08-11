@@ -2,13 +2,20 @@
 A simple project to count Organizations, Workspaces and Runs.
 
 ## set up
-This project requires two environment variables to run: TFE_ADDR and TFE_TOKEN.
+This project requiressome  environment variables to run:
+* TFE_ADDR - URL of the TFE instance you want to query (defaults to Terraform Cloud)
+* TFE_TOKEN - API Token to be used, this code will try and find all resources this token has access to (defaults to blank and will generate an error if not provided)
+* TFE_SITE_ADMIN - if the above token has site admin right use a different api (true/false defaults to false)
+* TFE_FILTER_START_DATE - start date in dd.mm.yyyy format runs and applies before this date will be ignored (defaults to 31.12.2020)
+* TFE_FILTER_END_DATE - end date in dd.mm.yyyy format runs and applies after this date will be ignored (defaults to today() ) 
 
 ### on Mac/Linux:
 ```bash
 export TFE_ADDR=https://app.terraform.io
 export TFE_API_TOKEN=hunter2
 export TFE_SITE_ADMIN=false
+export TFE_FILTER_START_DATE='31.12.2020'
+export TFE_FILTER_END_DATE='28.08.2021'
 ```
 
 ### on Windows:
@@ -81,7 +88,9 @@ the easy way to do this is add the env variables to the Dockefile and run:
 ```bash
 docker build .
 ```
+#### TODO
 
+* update binary packages with date filter
 
 
 
