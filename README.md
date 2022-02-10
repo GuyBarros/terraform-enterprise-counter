@@ -7,7 +7,7 @@ This project requiressome  environment variables to run:
 * TFE_TOKEN - API Token to be used, this code will try and find all resources this token has access to (defaults to blank and will generate an error if not provided)
 * TFE_SITE_ADMIN - if the above token has site admin right use a different api (true/false defaults to false)
 * TFE_FILTER_START_DATE - start date in dd.mm.yyyy format runs and applies before this date will be ignored (defaults to 31.12.2020)
-* TFE_FILTER_END_DATE - end date in dd.mm.yyyy format runs and applies after this date will be ignored (defaults to today() ) 
+* TFE_FILTER_END_DATE - end date in dd.mm.yyyy format runs and applies after this date will be ignored (defaults to today() )
 
 ### on Mac/Linux:
 ```bash
@@ -63,6 +63,13 @@ note: I've omitted some customer facing organizations so the sums wont add up.
 
 #### Python
 
+ if needed install the requirements with pip:
+
+ ```bash
+pip install -r ./requirements.txt
+```
+
+
 ```bash
 export TFE_ADDR=https://app.terraform.io
 export TFE_API_TOKEN=hunter2
@@ -70,7 +77,7 @@ export TFE_SITE_ADMIN=false
 python main.py
 ```
 
-#### binary 
+#### binary
 the Binaries for different OSes can be downloaded from releases. these binaries where created with PyInstaller.
 
 ```bash
