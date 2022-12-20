@@ -10,7 +10,7 @@ ipython==8.0.1
 ipython-genutils==0.2.0
 jedi==0.18.1
 jupyter-client==7.1.2
-jupyter-core==4.9.1
+jupyter-core==4.11.2
 macholib==1.15.2
 numpy==1.22.2
 packaging==21.3
