@@ -20,7 +20,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prompt-toolkit==3.0.27
 ptyprocess==0.7.0
-Pygments==2.11.2
+Pygments==2.15.0
 PyInstaller==4.9
 pyparsing==3.0.7
 python-dateutil==2.8.2
