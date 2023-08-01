@@ -12,7 +12,7 @@ from yaspin import yaspin
 pp = pprint.PrettyPrinter()
 
 TFE_ADDR =  os.environ.get('TFE_ADDR', 'https://app.terraform.io')
-TFE_API_TOKEN =  os.environ.get('TFE_API_TOKEN', 'byRvqI5jjRjrCQ.atlasv1.79WQl8IQ8sHbjyVZ115WJb1GBA5KbzyW5kAXr2MUEPW7rjz0TraxqB9A0vzO44hEgH4')
+TFE_API_TOKEN =  os.environ.get('TFE_API_TOKEN', '')
 TFE_SITE_ADMIN =  os.environ.get('TFE_SITE_ADMIN', 'false')
 TFE_PAGE_COUNT =  os.environ.get('TFE_PAGE_COUNT', 100)
 TFE_FILTER_START_DATE = os.environ.get('TFE_FILTER_START_DATE', '01.01.2023')
