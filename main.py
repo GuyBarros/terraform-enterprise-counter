@@ -60,7 +60,8 @@ def getOrgObj():
          'total_runs': getRunsTotalCount(item['id']),
          'total_applies': getAppliesTotalCount(item['id']),
          'workspace_count': getWorkspaceCount(item['id']),
-         'workspaces': getWorkspaceInfo(item['id'])
+         'workspaces': getWorkspaceInfo(item['id']),
+         'total_rums': getRUMsTotalCount(item['id'])
          }
          result.append(info)
     return result    
@@ -154,6 +155,28 @@ def getAppliesCount(workspace_id):
         resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
     return len(retorno)
 
+def getResourcesCount(workspace_id):
+    page = 1
+    retorno = []
+    resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/resources?page[size]=100&page[number]={page}', headers=headers )
+    if resp.status_code != 200:
+        # This means something went wrong.
+        pp.pprint(f"something went wrong while resources applies: {resp}")
+        return ""
+    todo_item = resp.json()['data']
+    metdata =   resp.json()['meta']['pagination']
+    current_page = metdata["current-page"]
+    total_pages = metdata["total-pages"]
+    while page <= total_pages:
+        todo_item = resp.json()['data']
+        metdata =   resp.json()['meta']['pagination']
+        current_page = metdata["current-page"]
+        for item in todo_item:
+            creation_date = datetime.strptime(item['attributes']['created-at'][:10], "%Y-%m-%d")
+            if date_start < creation_date and creation_date <= date_end: retorno.append(item['id'])
+        page += 1
+        resp = requests.get(TFE_ADDR+f'/api/v2/workspaces/{workspace_id}/runs?page[size]=100&page[number]={page}', headers=headers )
+    return len(retorno)
 
 def getRunsTotalCount(organisation):
     total_runs = 0
@@ -170,6 +193,14 @@ def getAppliesTotalCount(organisation):
         total_applies +=  getAppliesCount(item)
     pp.pprint(f"Total applies for {organisation}: {total_applies}")    
     return total_applies     
+
+def getRUMsTotalCount(organisation):
+    total_rums = 0
+    todo_item = getWorkspaceInfo(organisation)
+    for item in todo_item:
+        total_rums +=  getResourcesCount(item)
+    pp.pprint(f"Total RUMs for {organisation}: {total_rums}")    
+    return total_rums     
 
 @yaspin(text="Loading...")
 def getWorkspacesFromAdmin():
