@@ -5,10 +5,10 @@ import pandas
 pp = pprint.PrettyPrinter()
 # do `pip install terrasnek` before running this script
 
-TFE_TOKEN = os.getenv("TFE_TOKEN", None)
+TFE_API_TOKEN = os.getenv("TFE_TOKEN", None)
 TFE_URL = os.getenv("TFE_ADDR", "https://app.terraform.io")  # ex: https://app.terraform.io
 
-api = TFP(TFE_TOKEN, url=TFE_URL)
+api = TFP(TFE_API_TOKEN, url=TFE_URL)
 
 orgs = api.orgs.list()['data']
 print (f"Found {len(orgs)} Organizations")
